@@ -166,6 +166,17 @@ class PluginPhpFtp_v1{
     }
     return $rawlist;
   }
+  public function widget_demo_rawlist($data){
+    $data = new PluginWfArray($data);
+    wfPlugin::includeonce('php/ftp_v1');
+    $ftp = new PluginPhpFtp_v1();
+    $ftp->setData($data->get('data/ftp'));
+    $ftp->dir = $data->get('data/ftp/dir');
+    $rawlist = $ftp->rawlist();
+    $rawlist = $ftp->raw_list_top_level_7($rawlist);
+    $remote_files = $ftp->rawlist_files($rawlist);
+    wfHelp::textarea_dump($remote_files);
+  }
   public function page_demo(){
     wfHelp::yml_dump(array('data' => $this->data->get(), 'dir' => $this->dir));
     if(false){
