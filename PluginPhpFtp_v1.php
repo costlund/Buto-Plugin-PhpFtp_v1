@@ -6,6 +6,7 @@ class PluginPhpFtp_v1{
   public $file_list = array();
   public $folder_list = array();
   public $dir = null;
+  private $top_level = null;
   function __construct() {
     $this->data = new PluginWfArray();
     $this->data->set('server',   null);
@@ -100,6 +101,12 @@ class PluginPhpFtp_v1{
     $this->close();
     return $bool;
   }
+  /**
+   * 
+   * @param type $local_file
+   * @param type $remote_file
+   * @return type
+   */
   public function get($local_file, $remote_file){
     $this->conn();
     $this->login();
@@ -107,6 +114,11 @@ class PluginPhpFtp_v1{
     $this->close();
     return $bool;
   }
+  /**
+   * 
+   * @param type $remote_file
+   * @return type
+   */
   public function delete($remote_file){
     $this->conn();
     $this->login();
@@ -114,6 +126,23 @@ class PluginPhpFtp_v1{
     $this->close();
     return $bool;
   }
+  /**
+   * Delete folder (has to be empty).
+   * @param type $remote_dir
+   * @return type
+   */
+  public function rmdir($remote_dir){
+    $this->conn();
+    $this->login();
+    $bool = ftp_rmdir($this->conn, $this->dir.$remote_dir);   
+    $this->close();
+    return $bool;
+  }
+  /**
+   * 
+   * @param type $dir
+   * @return type
+   */
   public function mdir($dir){
     $this->conn();
     $this->login();
@@ -121,8 +150,45 @@ class PluginPhpFtp_v1{
     $this->close();
     return $bool;
   }
+  public function raw_list_top_level_7($rawlist){
+    /**
+     * PHP method ftp_rawlist is limited to 7 levels.
+     * If method rawlist set top_level to 7 this method keep checking for 7 levels more.
+     */
+    if($this->top_level=7){
+      foreach ($rawlist as $key => $value) {
+        $i = new PluginWfArray($value);
+        if($i->get('levels')==7 && $i->get('split/isdir')){
+          $rawlist2 = $this->rawlist($this->replace_web_folder($i->get('name')));
+          $rawlist = array_merge($rawlist, $rawlist2);
+        }
+      }
+    }
+    return $rawlist;
+  }
   public function page_demo(){
-    wfHelp::yml_dump($this->dir);
+    wfHelp::yml_dump(array('data' => $this->data->get(), 'dir' => $this->dir));
+    if(false){
+      $this->set_file_list();
+      wfHelp::yml_dump(array('sizeof' => sizeof($this->file_list), 'file_list' => $this->file_list), true);
+    }
+    if(false){
+      $rawlist = $this->rawlist();
+      $rawlist = $this->raw_list_top_level_7($rawlist);
+    }
+    if(false){
+      wfHelp::yml_dump(array('top_level' => $this->top_level, 'sizeof' => sizeof($rawlist), 'rawlist' => $rawlist), true);
+    }
+    if(false){
+      $rawlist_files = $this->rawlist_files($rawlist);
+      wfHelp::yml_dump(array('top_level' => $this->top_level, 'sizeof' => sizeof($rawlist_files), 'rawlist_files' => $rawlist_files), true);
+    }
+    if(false){
+      $rawlist_folders = $this->rawlist_folders($rawlist);
+      wfHelp::yml_dump(array('top_level' => $this->top_level, 'sizeof' => sizeof($rawlist_folders), 'rawlist_folders' => $rawlist_folders), true);
+    }
+    $this->set_file_list();
+    wfHelp::yml_dump($this->file_list);
   }
   private function nlist($directory = "/"){
     $this->conn();
@@ -131,16 +197,19 @@ class PluginPhpFtp_v1{
     $this->close();
     return $file_list;
   }
-  public function rawlist($directory = "/", $replace = array('/public_html' => '/[web_folder]')){
+  private function replace_web_folder($str){
+    return str_replace('/[web_folder]', '/public_html', $str);
+  }
+  public function rawlist($directory = null, $replace = array('/public_html' => '/[web_folder]')){
     /**
      * Method ftp_rawlist does not seems to get files more then 7 levels.
      * Use set_file_list() instead despite it´s slower.
      */
     $this->conn();
     $this->login();
-    $file_list = ftp_rawlist($this->conn, $this->dir.$directory, true);    
+    $raw_list = ftp_rawlist($this->conn, $this->dir.$directory, true);    
     $this->close();
-    $parse = $this->parse_rawlist($file_list, $directory, $replace);
+    $parse = $this->parse_rawlist($raw_list, $directory, $replace);
     return $parse;
   }
   private function parse_rawlist_value($value){
@@ -173,6 +242,9 @@ class PluginPhpFtp_v1{
   }
   private function parse_rawlist($rawlist, $start_dir, $replace)
   {
+    array_unshift($rawlist, '');
+    array_unshift($rawlist, $this->dir.':');
+    $this->top_level = 0;
     $remote_files = array();
     $i = -1;
     $folder_name = $start_dir;
@@ -185,12 +257,21 @@ class PluginPhpFtp_v1{
         $folder = true;
         $folder_name = substr($value, 0, strlen($value)-1);
         $folder_name = substr($folder_name, strlen($start_dir));
+        $folder_name = substr($folder_name, strlen($this->dir));
+
+        $folder_name = $start_dir.$folder_name;
         /**
          * replace...
          */
         $folder_name = str_replace('/public_html', '/[web_folder]', $folder_name);
       }
       if(!$folder){
+        $parsed = $this->parse_rawlist_value($value);
+        if (sizeof($parsed)) {
+          if($parsed['name']=='.' || $parsed['name']=='..'){
+            continue;
+          }
+        }
         $i++;
         $remote_files[$i]['name'] = null;
         $remote_files[$i]['levels'] = null;
@@ -198,13 +279,19 @@ class PluginPhpFtp_v1{
         $remote_files[$i]['remote_time'] = null;
         $remote_files[$i]['folder'] = $folder_name;
         $remote_files[$i]['raw'] = $value;
-        $parsed = $this->parse_rawlist_value($value);
         if (sizeof($parsed)) {
+          $levels = substr_count($folder_name, '/');
           /**
            * name
            */
           $remote_files[$i]['name'] = $folder_name.'/'.$parsed['name'];
-          $remote_files[$i]['levels'] = substr_count($folder_name, '/');
+          $remote_files[$i]['levels'] = $levels;
+          /**
+           * Set top level.
+           */
+          if($levels>$this->top_level){
+            $this->top_level = $levels;
+          }
           /**
            * remote_size
            */
@@ -224,7 +311,20 @@ class PluginPhpFtp_v1{
     foreach ($rawlist as $key => $value) {
       $item = new PluginWfArray($value);
       if(!$item->get('split/isdir')){
-        $temp[$item->get('name')] = array('remote_size' => $item->get('remote_size'), 'remote_time' => $item->get('remote_time'));
+        $temp[$item->get('name')] = array('remote_size' => $item->get('remote_size'), 'remote_time' => $item->get('remote_time'), 'levels' => $item->get('levels'));
+      }
+    }
+    return $temp;
+  }
+  public function rawlist_folders($rawlist){
+    $temp = array();
+    foreach ($rawlist as $key => $value) {
+      $item = new PluginWfArray($value);
+      if($item->get('split/isdir')){
+        if($item->get('name')=='/.' || $item->get('name')=='/..'){
+//          continue;
+        }
+        $temp[$item->get('name')] = array('remote_size' => $item->get('remote_size'), 'remote_time' => $item->get('remote_time'), 'levels' => $item->get('levels'));
       }
     }
     return $temp;

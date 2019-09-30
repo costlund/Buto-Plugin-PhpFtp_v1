@@ -1,5 +1,8 @@
-version: '1.0'
+version: '1.1'
 history:
+  '1.1':
+    date: '2019-09-30'
+    description: 'Fix where php method ftp_rawlist only returns files in 7 levels.'
   '1.0':
     date: '2019-09-25'
     description: 'Manifest created.'
