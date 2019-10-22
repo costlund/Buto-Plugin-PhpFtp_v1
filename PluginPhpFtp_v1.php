@@ -97,7 +97,14 @@ class PluginPhpFtp_v1{
      */
     $this->conn();
     $this->login();
-    $bool = ftp_put($this->conn, $this->dir.$remote_file, $local_file, FTP_ASCII);
+    if(false){
+      /**
+       * PNG images are corrupted using FTP_ASCII.
+       */
+      $bool = ftp_put($this->conn, $this->dir.$remote_file, $local_file, FTP_ASCII);
+    }else{
+      $bool = ftp_put($this->conn, $this->dir.$remote_file, $local_file, FTP_BINARY);
+    }
     $this->close();
     return $bool;
   }
