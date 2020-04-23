@@ -24,7 +24,7 @@ class PluginPhpFtp_v1{
     $this->data = new PluginWfArray($data);
   }
   public function conn(){
-    $this->conn = ftp_connect($this->data->get('server')) or die("Could not connect to ".$this->data->get('server')."!");
+    $this->conn = ftp_connect($this->data->get('server'), 21, 60*5) or die("Could not connect to ".$this->data->get('server')."!");
     return null;
   }
   public function close(){
