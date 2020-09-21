@@ -1,21 +1,28 @@
-version: '1.1.1'
+version: 1.1.2
 history:
-  '1.1.1':
+  1.1.2:
+    date: '2020-09-21'
+    label: 'Dir param'
+    description: 'If no folder directory exist one must set dir param to a slash.'
+  1.1.1:
     date: '2020-04-23'
     label: Timeout
     description: 'Set timeout to 5 min.'
-  '1.1.0':
+  1.1.0:
     date: '2019-09-30'
     label: Rawlist
     description: 'Fix where php method ftp_rawlist only returns files in 7 levels.'
-  '1.0.0':
+  1.0.0:
     date: '2019-09-25'
-    Label: First commit
+    Label: 'First commit'
     description: 'Manifest created.'
 plugin:
   -
     name: wf/yml
-    version: '1.1'
+    version: 1.2.2
+  -
+    name: php/ftp_v1
+    version: 1.1.2
 sys:
   -
     name: mercury

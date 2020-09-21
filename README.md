@@ -12,6 +12,12 @@ dir: /_folder_on_ftp_server_
 web_folder: public_html
 ```
 
+If there is no folder to access becaus ftp account is stricted to a specific folder one must set dir param to slash.
+```
+dir: '/'
+```
+
+
 ## Usage
 
 ```

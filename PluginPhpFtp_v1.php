@@ -258,6 +258,13 @@ class PluginPhpFtp_v1{
     }
     return $parsed;
   }
+  /**
+   * Parse ftp files and folders from a rawlist.
+   * @param string $rawlist
+   * @param string $start_dir
+   * @param array $replace
+   * @return array
+   */
   private function parse_rawlist($rawlist, $start_dir, $replace)
   {
     array_unshift($rawlist, '');
@@ -273,15 +280,40 @@ class PluginPhpFtp_v1{
       $folder = false;
       if(substr($value, 0, 1)=='/'){
         $folder = true;
+        /**
+         * Add next folder
+         */
         $folder_name = substr($value, 0, strlen($value)-1);
+        /**
+         * Extract next folder?
+         */
         $folder_name = substr($folder_name, strlen($start_dir));
+        /**
+         * Extranct first next folder
+         */
         $folder_name = substr($folder_name, strlen($this->dir));
-
+        /**
+         * Set full path to folder.
+         */
+        if(substr($folder_name, 0, 1)!='/'){
+          /**
+           * Add slash if not exist.
+           * Fix problem when using dir='/' and method raw_list_top_level_7 (200921, cö).
+           */
+          $folder_name = '/'.$folder_name;
+        }
         $folder_name = $start_dir.$folder_name;
         /**
-         * replace...
+         * Replace
          */
         $folder_name = str_replace('/public_html', '/[web_folder]', $folder_name);
+        /**
+         * Remove if '/' at last.
+         */
+        if(substr($folder_name, strlen($folder_name)-1)=='/'){
+          $folder_name = substr($folder_name, 0, strlen($folder_name)-1);
+        }
+        
       }
       if(!$folder){
         $parsed = $this->parse_rawlist_value($value);
