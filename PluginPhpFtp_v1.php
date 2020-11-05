@@ -247,6 +247,13 @@ class PluginPhpFtp_v1{
       $year = (int)date('Y');
       $time_now = time();
       $time = strtotime("".$parsed['day']." ".$parsed['month']." $year ".$parsed['time']."");
+      /**
+       * 
+       */
+      $time = $time-3600;
+      /**
+       * 
+       */
       if($time>$time_now){
         /**
          * Back one year.
