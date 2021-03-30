@@ -248,7 +248,7 @@ class PluginPhpFtp_v1{
       $time_now = time();
       $time = strtotime("".$parsed['day']." ".$parsed['month']." $year ".$parsed['time']."");
       /**
-       * 
+       * Time adjustment params should be an option in settings.
        */
       $time = $time-3600;
       /**
