@@ -1,5 +1,9 @@
-version: 1.1.4
+version: 1.2.0
 history:
+  1.2.0:
+    date: '2021-09-28'
+    label: 'Remote time'
+    description: 'Handle that remote time param could be a year or time (2020 or 17:33). If param is time year is now.'
   1.1.4:
     date: '2021-03-30'
     label: 'Code comment'

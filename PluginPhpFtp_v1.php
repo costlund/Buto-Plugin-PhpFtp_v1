@@ -18,7 +18,7 @@ class PluginPhpFtp_v1{
      */
     $data = new PluginWfYml(__DIR__.'/../../../../buto_data/plugin/php/ftp_v1/settings.yml');
     $this->data = new PluginWfArray($data->get('ftp'));
-    $this->dir = $data->get('ftp/dir');
+    $this->dir = (string)$data->get('ftp/dir');
   }
   public function setData($data){
     $this->data = new PluginWfArray($data);
@@ -71,9 +71,9 @@ class PluginPhpFtp_v1{
   }
   /**
    * 
-   * @param type $remote_file
-   * @param type $local_file
-   * @return type
+   * @param string $remote_file
+   * @param string $local_file
+   * @return bool
    */
   public function put($remote_file, $local_file){
     /**
@@ -110,9 +110,9 @@ class PluginPhpFtp_v1{
   }
   /**
    * 
-   * @param type $local_file
-   * @param type $remote_file
-   * @return type
+   * @param string $local_file
+   * @param string $remote_file
+   * @return bool
    */
   public function get($local_file, $remote_file){
     $this->conn();
@@ -244,30 +244,19 @@ class PluginPhpFtp_v1{
       $parsed['day']       = $split[6];
       $parsed['time']      = $split[7];
       $parsed['name']      = $split[8];
-      $year = (int)date('Y');
-      $time_now = time();
-      $time = strtotime("".$parsed['day']." ".$parsed['month']." $year ".$parsed['time']."");
-      /**
-       * Time adjustment params should be an option in settings.
-       */
-      $time = $time-3600;
-      /**
-       * 
-       */
-      if($time>$time_now){
-        /**
-         * Back one year.
-         */
-        $year--;
-        $time = strtotime("".$parsed['day']." ".$parsed['month']." $year ".$parsed['time']."");
+      if(strstr($parsed['time'], ':')){
+        $year = (int)date('Y');
+        $strtotime = "".$parsed['day']." ".$parsed['month']." $year ".$parsed['time']."";
+      }else{
+        $strtotime = "".$parsed['day']." ".$parsed['month']." ".$parsed['time']." 00:00";
       }
-      $parsed['remote_time'] = $time;
+      $parsed['remote_time'] = strtotime($strtotime);;
     }
     return $parsed;
   }
   /**
    * Parse ftp files and folders from a rawlist.
-   * @param string $rawlist
+   * @param array $rawlist
    * @param string $start_dir
    * @param array $replace
    * @return array
