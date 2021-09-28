@@ -248,7 +248,7 @@ class PluginPhpFtp_v1{
         $year = (int)date('Y');
         $strtotime = "".$parsed['day']." ".$parsed['month']." $year ".$parsed['time']."";
       }else{
-        $strtotime = "".$parsed['day']." ".$parsed['month']." ".$parsed['time']." 00:00";
+        $strtotime = "".$parsed['day']." ".$parsed['month']." ".$parsed['time']." 23:59";
       }
       $parsed['remote_time'] = strtotime($strtotime);;
     }

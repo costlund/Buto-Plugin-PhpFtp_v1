@@ -1,5 +1,9 @@
-version: 1.2.1
+version: 1.2.2
 history:
+  1.2.2:
+    date: '2021-09-28'
+    label: 'Remote time'
+    description: 'Set remote time to 23:59 if year is provided.'
   1.2.1:
     date: '2021-09-28'
     title: Versions
