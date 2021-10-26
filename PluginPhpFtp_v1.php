@@ -234,7 +234,7 @@ class PluginPhpFtp_v1{
     $split = preg_split("[ ]", $value, 9, PREG_SPLIT_NO_EMPTY);
     $parsed = array();
     if ($split[0] != "total") {
-      $parsed['isdir']     = $split[0]{0} === "d";
+      $parsed['isdir']     = $split[0][0] === "d";
       $parsed['perms']     = $split[0];
       $parsed['number']    = $split[1];
       $parsed['owner']     = $split[2];
