@@ -247,10 +247,19 @@ class PluginPhpFtp_v1{
       if(strstr($parsed['time'], ':')){
         $year = (int)date('Y');
         $strtotime = "".$parsed['day']." ".$parsed['month']." $year ".$parsed['time']."";
+        /**
+         * if $strtotime is in the future we have to roll back one year.
+         */
+        if(strtotime($strtotime) > time()){
+          $year--;
+          $strtotime = "".$parsed['day']." ".$parsed['month']." $year ".$parsed['time']."";
+        }
       }else{
+        $year = $parsed['time'];
         $strtotime = "".$parsed['day']." ".$parsed['month']." ".$parsed['time']." 23:59";
       }
       $parsed['remote_time'] = strtotime($strtotime);;
+      $parsed['year'] = $year;
     }
     return $parsed;
   }
