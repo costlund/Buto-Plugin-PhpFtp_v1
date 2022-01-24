@@ -1,8 +1,12 @@
-version: 1.4.0
+version: 1.4.1
 history:
+  1.4.1:
+    date: '2022-01-24'
+    title: Versions
+    description: 'Versions update.'
   1.4.0:
     date: '2022-01-19'
-    title: Remote time
+    title: 'Remote time'
     description: 'Year of remote time was plus one year.'
   1.3.1:
     date: '2021-10-26'
@@ -54,7 +58,7 @@ plugin:
     version: 1.3.1
   -
     name: php/ftp_v1
-    version: 1.3.0
+    version: 1.4.0
 sys:
   -
     name: mercury
