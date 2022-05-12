@@ -31,3 +31,6 @@ $rawlist = $ftp->raw_list_top_level_7($rawlist);
 $remote_files = $ftp->rawlist_files($rawlist);
 wfHelp::textarea_dump($remote_files);
 ```
+
+## Issues
+- When using vpn there could be a ftp block configuration making this plugin not usable.
