@@ -48,7 +48,7 @@ class PluginPhpFtp_v1{
     $this->close();
   }
   private function set_file_list2($dir){
-    $folder = substr($dir, strlen($this->dir));
+    $folder = wfPhpfunc::substr($dir, wfPhpfunc::strlen($this->dir));
     $rawlist = ftp_rawlist($this->conn, $dir);
     /**
      * Set folder list.
@@ -63,8 +63,8 @@ class PluginPhpFtp_v1{
       }elseif($parsed['isdir']){
         $this->set_file_list2($dir.'/'.$parsed['name']);
       }else{
-        $dir2 = substr($dir.'/'.$parsed['name'], strlen($this->dir));
-        $dir2 = str_replace('/public_html', '/[web_folder]', $dir2);
+        $dir2 = wfPhpfunc::substr($dir.'/'.$parsed['name'], wfPhpfunc::strlen($this->dir));
+        $dir2 = wfPhpfunc::str_replace('/public_html', '/[web_folder]', $dir2);
         $this->file_list[$dir2] = array('remote_size' => $parsed['size'], 'remote_time' => $parsed['remote_time']);
       }
     }
@@ -80,7 +80,7 @@ class PluginPhpFtp_v1{
      * Make folders if not exist.
      */
     $dirname = dirname($remote_file);
-    $dir_split = preg_split("#/#", substr($dirname, 1)); 
+    $dir_split = preg_split("#/#", wfPhpfunc::substr($dirname, 1)); 
     $dir_str = null;
     $dir_array = array();
     foreach ($dir_split as $key => $value) {
@@ -216,7 +216,7 @@ class PluginPhpFtp_v1{
     return $file_list;
   }
   private function replace_web_folder($str){
-    return str_replace('/[web_folder]', '/public_html', $str);
+    return wfPhpfunc::str_replace('/[web_folder]', '/public_html', $str);
   }
   public function rawlist($directory = null, $replace = array('/public_html' => '/[web_folder]')){
     /**
@@ -244,7 +244,7 @@ class PluginPhpFtp_v1{
       $parsed['day']       = $split[6];
       $parsed['time']      = $split[7];
       $parsed['name']      = $split[8];
-      if(strstr($parsed['time'], ':')){
+      if(wfPhpfunc::strstr($parsed['time'], ':')){
         $year = (int)date('Y');
         $strtotime = "".$parsed['day']." ".$parsed['month']." $year ".$parsed['time']."";
         /**
@@ -283,24 +283,24 @@ class PluginPhpFtp_v1{
         continue;
       }
       $folder = false;
-      if(substr($value, 0, 1)=='/'){
+      if(wfPhpfunc::substr($value, 0, 1)=='/'){
         $folder = true;
         /**
          * Add next folder
          */
-        $folder_name = substr($value, 0, strlen($value)-1);
+        $folder_name = wfPhpfunc::substr($value, 0, wfPhpfunc::strlen($value)-1);
         /**
          * Extract next folder?
          */
-        $folder_name = substr($folder_name, strlen($start_dir));
+        $folder_name = wfPhpfunc::substr($folder_name, wfPhpfunc::strlen($start_dir));
         /**
          * Extranct first next folder
          */
-        $folder_name = substr($folder_name, strlen($this->dir));
+        $folder_name = wfPhpfunc::substr($folder_name, wfPhpfunc::strlen($this->dir));
         /**
          * Set full path to folder.
          */
-        if(substr($folder_name, 0, 1)!='/'){
+        if(wfPhpfunc::substr($folder_name, 0, 1)!='/'){
           /**
            * Add slash if not exist.
            * Fix problem when using dir='/' and method raw_list_top_level_7 (200921, cö).
@@ -311,12 +311,12 @@ class PluginPhpFtp_v1{
         /**
          * Replace
          */
-        $folder_name = str_replace('/public_html', '/[web_folder]', $folder_name);
+        $folder_name = wfPhpfunc::str_replace('/public_html', '/[web_folder]', $folder_name);
         /**
          * Remove if '/' at last.
          */
-        if(substr($folder_name, strlen($folder_name)-1)=='/'){
-          $folder_name = substr($folder_name, 0, strlen($folder_name)-1);
+        if(wfPhpfunc::substr($folder_name, wfPhpfunc::strlen($folder_name)-1)=='/'){
+          $folder_name = wfPhpfunc::substr($folder_name, 0, wfPhpfunc::strlen($folder_name)-1);
         }
         
       }
